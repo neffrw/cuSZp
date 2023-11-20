@@ -1,5 +1,6 @@
 #include "cuSZp_entry_f32.h"
 #include "cuSZp_f32.h"
+#include <stdio.h>
 
 void SZp_compress_hostptr_f32(float* oriData, unsigned char* cmpBytes, size_t nbEle, size_t* cmpSize, float errorBound)
 {
@@ -92,7 +93,6 @@ void SZp_decompress_hostptr_f32(float* decData, unsigned char* cmpBytes, size_t 
 
 void SZp_compress_deviceptr_f32(float* d_oriData, unsigned char* d_cmpBytes, size_t nbEle, size_t* cmpSize, float errorBound, cudaStream_t stream)
 {
-    // Data blocking.
     int bsize = cmp_tblock_size_f32;
     int gsize = (nbEle + bsize * cmp_chunk_f32 - 1) / (bsize * cmp_chunk_f32);
     int cmpOffSize = gsize + 1;
@@ -105,7 +105,7 @@ void SZp_compress_deviceptr_f32(float* d_oriData, unsigned char* d_cmpBytes, siz
     cudaMemset(d_cmpOffset, 0, sizeof(unsigned int)*cmpOffSize);
     cudaMalloc((void**)&d_flag, sizeof(int)*cmpOffSize);
     cudaMemset(d_flag, 0, sizeof(int)*cmpOffSize);
-    cudaMemset(d_oriData + nbEle, 0, (pad_nbEle - nbEle) * sizeof(float));
+    // cudaMemset(d_oriData + nbEle, 0, (pad_nbEle - nbEle) * sizeof(float));
 
     // cuSZp GPU compression.
     dim3 blockSize(bsize);
